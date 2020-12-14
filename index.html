@@ -31,8 +31,16 @@
         font-size: 70pt;
     }
 
-    h3 {
+    h2 {
         font-size: 30pt;
+    }
+
+    h3 {
+        font-size: 25pt;
+    }
+
+    h4 {
+        font-size: 20pt;
     }
 
     .footer {
@@ -47,7 +55,11 @@
 
 <body>
 <h1 class="center" id="title"></h1>
-<h3 class="center" id="countdown"></h3>
+<h2 class="center" id="countdown"></h2>
+
+<br/><br/><br/>
+<h3 class="center" id="fuckingClosed"></h3>
+<h4 class="center" id="lockdownCountdown"></h4>
 
 <div class="footer">
     <p>
@@ -72,15 +84,21 @@
 
     let titleElement = document.getElementById("title");
     let countdownElement = document.getElementById("countdown");
+    let newsElement = document.getElementById("fuckingClosed");
+    let lockdownCountdownElement = document.getElementById("lockdownCountdown");
 
     window.onload = () => {
-        createTitle();
-        startCountdown();
+        updateLoop();
 
-        setInterval(() => {
-            createTitle();
-            startCountdown();
-        }, 1000);
+        setInterval(updateLoop, 1000);
+    }
+
+    function updateLoop() {
+        createTitle();
+
+        let now = new Date();
+        startCountdownToClose(now);
+        startCountdownToLockdown(now);
     }
 
     function isOpen(hour) {
@@ -93,6 +111,8 @@
         } else {
             titleElement.textContent = "Dneska už je zavřeno! Otevírá se v " + openingHour.pad(2) + ":00.";
         }
+
+        newsElement.textContent = "Trvale (do odvolání) se zavírají hospody ve čtvrtek 17.12. v 20:00. Poté 0-23h pouze okýnka";
     }
 
     function setTime(date, hour) {
@@ -102,26 +122,41 @@
         return date;
     }
 
-    function startCountdown() {
-        let now = new Date();
+    function startCountdownToClose(from) {
         let closingOrOpeningTime;
-        if (isOpen(now.getHours())) {
+        if (isOpen(from.getHours())) {
             closingOrOpeningTime = setTime(new Date(), closingHour);
         } else {
             closingOrOpeningTime = setTime(new Date(), openingHour);
-            if (now.getHours() > openingHour) closingOrOpeningTime.setDate(closingOrOpeningTime.getDate() + 1);
+            if (from.getHours() > openingHour) closingOrOpeningTime.setDate(closingOrOpeningTime.getDate() + 1);
         }
 
-        setCountdownText(closingOrOpeningTime.getTime() - now.getTime());
+        startCountdown(countdownElement, from, closingOrOpeningTime);
+        setCountdownText(closingOrOpeningTime.getTime() - from.getTime());
     }
 
-    function setCountdownText(timeLeft) {
+    function startCountdownToLockdown(from) {
+        startCountdown(lockdownCountdownElement, from, new Date("2020-12-17T20:00:00.000+0000"));
+    }
+
+    function startCountdown(element, from, to) {
+        setCountdownText(element, to.getTime() - from.getTime());
+    }
+
+    function setCountdownText(element, timeLeft) {
+        let days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
+        timeLeft -= days * 24 * 60 * 60 * 1000;
         let hours = Math.floor(timeLeft / (60 * 60 * 1000));
         timeLeft -= hours * 60 * 60 * 1000;
         let minutes = Math.floor(timeLeft / (60 * 1000));
         timeLeft -= minutes * 60 * 1000;
         let seconds = Math.floor(timeLeft / 1000);
-        countdownElement.textContent = "To je za " + hours.pad(2) + ":" + minutes.pad(2) + ":" + seconds.pad(2);
+
+        let text = "To je za ";
+        if (days > 0) text += days.pad(2) + ":";
+        text += hours.pad(2) + ":" + minutes.pad(2) + ":" + seconds.pad(2);
+
+        element.textContent = text;
     }
 </script>
 </html>

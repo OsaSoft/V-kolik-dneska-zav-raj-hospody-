@@ -54,7 +54,7 @@
 </style>
 
 <body>
-<h1 class="center" id="title">V tuhle chvíli je zavřeno. Může se pouze do výdejních okýnek</h1>
+<h1 class="center" id="title"></h1>
 <h2 class="center" id="countdown"></h2>
 
 <br/><br/><br/>
@@ -79,18 +79,17 @@
         return s;
     };
 
-    const openingHour = 8;
-    const closingHour = 20;
+    const openingHour = 6;
+    const closingHour = 22;
 
     let titleElement = document.getElementById("title");
     let countdownElement = document.getElementById("countdown");
     let newsElement = document.getElementById("fuckingClosed");
-    let lockdownCountdownElement = document.getElementById("lockdownCountdown");
 
     window.onload = () => {
-        // updateLoop();
-        //
-        // setInterval(updateLoop, 1000);
+        updateLoop();
+
+        setInterval(updateLoop, 1000);
     }
 
     function updateLoop() {
@@ -98,7 +97,6 @@
 
         let now = new Date();
         startCountdownToClose(now);
-        startCountdownToLockdown(now);
     }
 
     function isOpen(hour) {
@@ -112,7 +110,7 @@
             titleElement.textContent = "Dneska už je zavřeno! Otevírá se v " + openingHour.pad(2) + ":00.";
         }
 
-        newsElement.textContent = "Trvale (do odvolání) se zavírají hospody ve čtvrtek 17.12. v 20:00. Poté 0-23h pouze okýnka";
+        newsElement.textContent = "Otevřené jsou ovšem pouze zahrádky";
     }
 
     function setTime(date, hour) {
@@ -133,10 +131,6 @@
 
         startCountdown(countdownElement, from, closingOrOpeningTime);
         setCountdownText(closingOrOpeningTime.getTime() - from.getTime());
-    }
-
-    function startCountdownToLockdown(from) {
-        startCountdown(lockdownCountdownElement, from, new Date("2020-12-17T20:00:00.000+0000"));
     }
 
     function startCountdown(element, from, to) {
